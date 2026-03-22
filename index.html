@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>حجز المواعيد — Smart Web</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   DESIGN SYSTEM
+===================================================== */
+:root {
+  --bg:        #f7f4ef;
+  --bg2:       #eeeae2;
+  --ink:       #1a1814;
+  --ink2:      #4a4640;
+  --ink3:      #8a8480;
+  --gold:      #c8973a;
+  --gold-lt:   #e8b85a;
+  --gold-pale: #fdf5e6;
+  --red:       #d44a3a;
+  --green:     #2e7d52;
+  --white:     #ffffff;
+  --border:    rgba(26,24,20,0.1);
+  --shadow:    0 2px 20px rgba(26,24,20,0.08);
+  --shadow-lg: 0 8px 48px rgba(26,24,20,0.14);
+  --r:         14px;
+  --ease:      cubic-bezier(0.23,1,0.32,1);
+}
+
+*,*::before,*::after { margin:0;padding:0;box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Tajawal',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+.page {
+  max-width:1100px;
+  margin:0 auto;
+  padding:0 20px;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+header {
+  background:var(--ink);
+  color:var(--white);
+  padding:0 20px;
+  position:sticky;top:0;z-index:100;
+}
+.header-inner {
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+}
+.logo {
+  display:flex;align-items:center;gap:10px;
+  font-size:1.15rem;font-weight:700;letter-spacing:.5px;
+}
+.logo-dot {
+  width:32px;height:32px;border-radius:8px;
+  background:var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;
+}
+.header-sub { font-size:.78rem;color:rgba(255,255,255,.5);margin-top:1px; }
+.header-stats {
+  display:flex;gap:24px;
+}
+.hstat { text-align:center; }
+.hstat strong { display:block;font-size:1.1rem;font-weight:700;color:var(--gold-lt); }
+.hstat span { font-size:.65rem;color:rgba(255,255,255,.4);letter-spacing:1px;text-transform:uppercase; }
+
+/* =====================================================
+   HERO STRIP
+===================================================== */
+.hero-strip {
+  background:linear-gradient(135deg,var(--ink) 0%,#2d2820 100%);
+  color:var(--white);
+  padding:48px 20px;
+  text-align:center;
+  position:relative;overflow:hidden;
+}
+.hero-strip::before {
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 60% 60% at 20% 50%,rgba(200,151,58,.15),transparent),
+    radial-gradient(ellipse 40% 40% at 80% 30%,rgba(200,151,58,.08),transparent);
+}
+.hero-strip-inner { position:relative;z-index:1; }
+.hero-tag {
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:.7rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--gold-lt);margin-bottom:1rem;
+}
+.tag-line { width:24px;height:1px;background:var(--gold); }
+.hero-title {
+  font-size:clamp(1.8rem,4vw,3rem);font-weight:900;
+  line-height:1.15;margin-bottom:.75rem;
+  letter-spacing:-.5px;
+}
+.hero-title span { color:var(--gold-lt); }
+.hero-sub { font-size:.95rem;color:rgba(255,255,255,.55);max-width:400px;margin:0 auto; }
+
+/* =====================================================
+   TABS NAV
+===================================================== */
+.tabs-bar {
+  background:var(--white);
+  border-bottom:1px solid var(--border);
+  position:sticky;top:64px;z-index:90;
+}
+.tabs-inner {
+  max-width:1100px;margin:0 auto;padding:0 20px;
+  display:flex;gap:0;
+}
+.tab-btn {
+  padding:0 24px;height:52px;
+  background:none;border:none;cursor:pointer;
+  font-family:'Tajawal',sans-serif;font-size:.88rem;font-weight:500;
+  color:var(--ink3);position:relative;
+  transition:color .25s;
+  display:flex;align-items:center;gap:7px;
+  white-space:nowrap;
+}
+.tab-btn::after {
+  content:'';position:absolute;bottom:0;right:0;left:0;height:2px;
+  background:var(--gold);transform:scaleX(0);transform-origin:right;
+  transition:transform .3s var(--ease);
+}
+.tab-btn.active { color:var(--ink); }
+.tab-btn.active::after { transform:scaleX(1); }
+.tab-btn:hover { color:var(--ink); }
+.tab-icon { font-size:1.05rem; }
+.tab-badge {
+  background:var(--gold);color:var(--white);
+  font-size:.6rem;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;
+}
+
+/* =====================================================
+   SECTIONS
+===================================================== */
+.section { display:none;padding:32px 0 60px; }
+.section.active { display:block; }
+
+/* =====================================================
+   NEW BOOKING FORM
+===================================================== */
+.booking-layout {
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:28px;align-items:start;
+}
+.card {
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:28px;box-shadow:var(--shadow);
+}
+.card-title {
+  font-size:1rem;font-weight:700;margin-bottom:20px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title-icon {
+  width:32px;height:32px;border-radius:8px;
+  background:var(--gold-pale);
+  display:flex;align-items:center;justify-content:center;font-size:.9rem;
+}
+/* Form fields */
+.field { margin-bottom:18px; }
+.field label {
+  display:block;font-size:.8rem;font-weight:500;
+  color:var(--ink2);margin-bottom:6px;
+}
+.field-req { color:var(--gold);margin-right:2px; }
+.field input,
+.field select,
+.field textarea {
+  width:100%;padding:12px 16px;
+  border:1.5px solid var(--border);border-radius:10px;
+  background:var(--bg);
+  font-family:'Tajawal',sans-serif;font-size:.9rem;color:var(--ink);
+  outline:none;transition:border-color .25s,box-shadow .25s;
+  appearance:none;
+}
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(200,151,58,.12);
+}
+.field textarea { resize:vertical;min-height:90px; }
+.field select { background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23888' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:left 14px center;padding-left:38px; }
+.field-row { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+
+/* Services grid */
+.services-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;
+}
+.svc-item {
+  border:1.5px solid var(--border);border-radius:10px;
+  padding:12px 14px;cursor:pointer;transition:all .25s var(--ease);
+  position:relative;
+}
+.svc-item:hover { border-color:var(--gold);background:var(--gold-pale); }
+.svc-item.selected { border-color:var(--gold);background:var(--gold-pale); }
+.svc-item.selected::after {
+  content:'✓';
+  position:absolute;top:8px;left:10px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--gold);color:var(--white);
+  font-size:.65rem;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.svc-name { font-size:.85rem;font-weight:600;color:var(--ink);margin-bottom:3px; }
+.svc-meta { font-size:.72rem;color:var(--ink3); }
+.svc-price { font-size:.78rem;font-weight:700;color:var(--gold);margin-top:4px; }
+
+/* Calendar */
+.cal-nav {
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.cal-nav-btn {
+  width:32px;height:32px;border-radius:8px;
+  border:1px solid var(--border);background:var(--white);
+  cursor:pointer;font-size:.85rem;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+}
+.cal-nav-btn:hover { background:var(--gold);border-color:var(--gold);color:var(--white); }
+.cal-month { font-size:.9rem;font-weight:700; }
+.cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:4px; }
+.cal-day-name {
+  text-align:center;font-size:.65rem;font-weight:600;
+  color:var(--ink3);padding:4px 0;letter-spacing:.5px;
+}
+.cal-day {
+  aspect-ratio:1;border-radius:8px;border:none;
+  background:none;cursor:pointer;
+  font-size:.8rem;font-family:'Tajawal',sans-serif;
+  color:var(--ink2);transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.cal-day:hover:not(:disabled) { background:var(--bg2); }
+.cal-day.today { font-weight:700;color:var(--gold); }
+.cal-day.today::after {
+  content:'';position:absolute;bottom:3px;right:50%;transform:translateX(50%);
+  width:4px;height:4px;border-radius:50%;background:var(--gold);
+}
+.cal-day.selected {
+  background:var(--gold);color:var(--white);font-weight:700;
+}
+.cal-day.has-slots::before {
+  content:'';position:absolute;top:3px;right:50%;transform:translateX(50%);
+  width:4px;height:4px;border-radius:50%;background:var(--green);
+}
+.cal-day:disabled { color:var(--border);cursor:not-allowed; }
+.cal-day.other-month { color:var(--border); }
+
+/* Time slots */
+.slots-title {
+  font-size:.8rem;font-weight:600;color:var(--ink2);
+  margin:18px 0 10px;
+}
+.slots-grid { display:grid;grid-template-columns:repeat(4,1fr);gap:7px; }
+.slot {
+  padding:9px 4px;border:1.5px solid var(--border);border-radius:8px;
+  background:var(--white);cursor:pointer;text-align:center;
+  font-size:.78rem;font-family:'Tajawal',sans-serif;font-weight:500;
+  color:var(--ink2);transition:all .2s;
+}
+.slot:hover { border-color:var(--gold);color:var(--gold); }
+.slot.selected { background:var(--gold);border-color:var(--gold);color:var(--white); }
+.slot.taken { background:var(--bg2);color:var(--border);cursor:not-allowed;border-color:transparent; }
+
+/* Submit button */
+.btn-submit {
+  width:100%;padding:15px;
+  background:var(--ink);color:var(--white);
+  border:none;border-radius:10px;cursor:pointer;
+  font-family:'Tajawal',sans-serif;font-size:1rem;font-weight:700;
+  letter-spacing:.3px;
+  transition:all .3s var(--ease);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  position:relative;overflow:hidden;
+}
+.btn-submit::before {
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);
+  transform:translateX(-100%);transition:transform .5s;
+}
+.btn-submit:hover::before { transform:translateX(100%); }
+.btn-submit:hover { background:var(--gold);transform:translateY(-2px);box-shadow:0 8px 24px rgba(200,151,58,.35); }
+.btn-submit:active { transform:translateY(0); }
+.btn-submit:disabled { background:var(--bg2);color:var(--ink3);cursor:not-allowed;transform:none;box-shadow:none; }
+
+/* Summary card */
+.summary-card {
+  background:var(--ink);color:var(--white);
+  border-radius:var(--r);padding:24px;
+  margin-bottom:20px;
+}
+.summary-title { font-size:.75rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:14px; }
+.sum-row {
+  display:flex;justify-content:space-between;align-items:center;
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,.08);
+  font-size:.85rem;
+}
+.sum-row:last-child { border-bottom:none; }
+.sum-lbl { color:rgba(255,255,255,.5); }
+.sum-val { font-weight:600; }
+.sum-val.gold { color:var(--gold-lt); }
+.sum-total {
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.15);
+  font-size:1rem;font-weight:700;
+}
+.sum-total span:last-child { color:var(--gold-lt);font-size:1.2rem; }
+
+/* =====================================================
+   APPOINTMENTS LIST
+===================================================== */
+.appt-toolbar {
+  display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;
+}
+.search-box {
+  flex:1;min-width:200px;position:relative;
+}
+.search-box input {
+  width:100%;padding:10px 16px 10px 40px;
+  border:1.5px solid var(--border);border-radius:10px;
+  background:var(--white);font-family:'Tajawal',sans-serif;font-size:.88rem;
+  outline:none;transition:border-color .25s;
+}
+.search-box input:focus { border-color:var(--gold); }
+.search-icon {
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  font-size:.9rem;color:var(--ink3);pointer-events:none;
+}
+.filter-btn {
+  padding:10px 16px;border:1.5px solid var(--border);border-radius:10px;
+  background:var(--white);cursor:pointer;font-family:'Tajawal',sans-serif;
+  font-size:.82rem;font-weight:500;color:var(--ink2);transition:all .2s;
+  white-space:nowrap;
+}
+.filter-btn:hover,.filter-btn.active { border-color:var(--gold);color:var(--gold);background:var(--gold-pale); }
+
+.appt-list { display:flex;flex-direction:column;gap:12px; }
+.appt-card {
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:18px 20px;
+  display:flex;align-items:center;gap:16px;
+  box-shadow:var(--shadow);
+  transition:all .25s var(--ease);
+  animation:slideIn .4s var(--ease) both;
+}
+@keyframes slideIn {
+  from { opacity:0;transform:translateY(12px); }
+  to   { opacity:1;transform:translateY(0); }
+}
+.appt-card:hover { box-shadow:var(--shadow-lg);transform:translateY(-2px); }
+.appt-date-box {
+  min-width:60px;height:60px;border-radius:10px;
+  background:var(--ink);color:var(--white);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.appt-day { font-size:1.4rem;font-weight:900;line-height:1; }
+.appt-mon { font-size:.6rem;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.5); }
+.appt-info { flex:1;min-width:0; }
+.appt-name { font-size:.95rem;font-weight:700;margin-bottom:3px; }
+.appt-meta { font-size:.78rem;color:var(--ink3);display:flex;gap:12px;flex-wrap:wrap; }
+.appt-meta span { display:flex;align-items:center;gap:4px; }
+.status-badge {
+  padding:4px 12px;border-radius:20px;
+  font-size:.7rem;font-weight:700;letter-spacing:.5px;white-space:nowrap;
+  flex-shrink:0;
+}
+.status-badge.confirmed { background:#e8f5ee;color:var(--green); }
+.status-badge.pending   { background:#fff8e8;color:#b07a10; }
+.status-badge.cancelled { background:#fdecea;color:var(--red); }
+.appt-actions { display:flex;gap:8px;flex-shrink:0; }
+.appt-btn {
+  width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);
+  background:var(--white);cursor:pointer;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.appt-btn:hover { background:var(--ink);border-color:var(--ink);color:var(--white); }
+.appt-btn.danger:hover { background:var(--red);border-color:var(--red); }
+
+/* Empty state */
+.empty-state {
+  text-align:center;padding:60px 20px;color:var(--ink3);
+}
+.empty-icon { font-size:3rem;margin-bottom:12px; }
+.empty-title { font-size:1rem;font-weight:600;color:var(--ink2);margin-bottom:6px; }
+.empty-sub { font-size:.85rem; }
+
+/* =====================================================
+   DASHBOARD
+===================================================== */
+.stats-grid {
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;margin-bottom:28px;
+}
+.stat-card {
+  background:var(--white);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px;box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+}
+.stat-card::before {
+  content:'';position:absolute;top:0;right:0;
+  width:60px;height:60px;border-radius:0 var(--r) 0 60px;
+  background:var(--gold-pale);
+}
+.stat-num {
+  font-size:2rem;font-weight:900;line-height:1;
+  margin-bottom:4px;
+}
+.stat-lbl { font-size:.78rem;color:var(--ink3); }
+.stat-trend {
+  font-size:.72rem;font-weight:600;margin-top:8px;
+  display:flex;align-items:center;gap:4px;
+}
+.trend-up { color:var(--green); }
+.trend-dn { color:var(--red); }
+
+.dash-grid {
+  display:grid;grid-template-columns:1.5fr 1fr;
+  gap:20px;
+}
+/* Today's schedule */
+.schedule-list { display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto; }
+.schedule-list::-webkit-scrollbar { width:4px; }
+.schedule-list::-webkit-scrollbar-thumb { background:var(--bg2);border-radius:2px; }
+.sch-item {
+  display:flex;align-items:center;gap:12px;
+  padding:12px;border-radius:10px;
+  border:1px solid var(--border);background:var(--bg);
+  transition:all .2s;
+}
+.sch-item:hover { background:var(--white);box-shadow:var(--shadow); }
+.sch-time {
+  font-size:.8rem;font-weight:700;color:var(--gold);
+  min-width:48px;text-align:center;font-family:'DM Mono',monospace;
+}
+.sch-sep { width:1px;height:32px;background:var(--border); }
+.sch-name { font-size:.85rem;font-weight:600; }
+.sch-svc { font-size:.72rem;color:var(--ink3);margin-top:1px; }
+.sch-dot { width:8px;height:8px;border-radius:50%;margin-right:auto;flex-shrink:0; }
+
+/* Mini donut chart */
+.donut-wrap {
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;gap:16px;
+}
+.donut-chart {
+  position:relative;width:140px;height:140px;
+}
+.donut-chart svg { transform:rotate(-90deg); }
+.donut-center {
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.donut-num { font-size:1.6rem;font-weight:900;line-height:1; }
+.donut-sub { font-size:.65rem;color:var(--ink3); }
+.donut-legend { display:flex;flex-direction:column;gap:8px;width:100%; }
+.legend-item {
+  display:flex;align-items:center;gap:8px;
+  font-size:.78rem;
+}
+.legend-dot { width:10px;height:10px;border-radius:3px;flex-shrink:0; }
+.legend-val { margin-right:auto;font-weight:700; }
+
+/* =====================================================
+   SETTINGS
+===================================================== */
+.settings-grid {
+  display:grid;grid-template-columns:1fr 1fr;gap:20px;
+}
+.toggle-row {
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;border-bottom:1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom:none; }
+.toggle-lbl { font-size:.88rem; }
+.toggle-sub { font-size:.75rem;color:var(--ink3);margin-top:2px; }
+.toggle {
+  position:relative;width:44px;height:24px;flex-shrink:0;
+}
+.toggle input { opacity:0;width:0;height:0;position:absolute; }
+.toggle-slider {
+  position:absolute;inset:0;border-radius:12px;
+  background:var(--bg2);cursor:pointer;transition:.3s;
+}
+.toggle-slider::before {
+  content:'';position:absolute;
+  width:18px;height:18px;border-radius:50%;background:var(--white);
+  top:3px;right:3px;transition:.3s;
+  box-shadow:0 1px 4px rgba(0,0,0,.15);
+}
+.toggle input:checked + .toggle-slider { background:var(--gold); }
+.toggle input:checked + .toggle-slider::before { transform:translateX(-20px); }
+.hours-grid {
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px;
+}
+.day-toggle {
+  aspect-ratio:1;border-radius:8px;border:1.5px solid var(--border);
+  background:var(--white);cursor:pointer;
+  font-size:.72rem;font-weight:600;color:var(--ink3);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.day-toggle.on { background:var(--ink);border-color:var(--ink);color:var(--white); }
+.input-sm {
+  padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;
+  background:var(--bg);font-family:'Tajawal',sans-serif;font-size:.85rem;
+  outline:none;transition:border-color .25s;width:100%;
+}
+.input-sm:focus { border-color:var(--gold); }
+
+/* =====================================================
+   SUCCESS MODAL
+===================================================== */
+.modal-overlay {
+  position:fixed;inset:0;background:rgba(26,24,20,.55);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;opacity:0;visibility:hidden;
+  transition:all .35s var(--ease);padding:20px;
+}
+.modal-overlay.open { opacity:1;visibility:visible; }
+.modal {
+  background:var(--white);border-radius:20px;
+  padding:40px;max-width:420px;width:100%;text-align:center;
+  transform:scale(.9) translateY(20px);
+  transition:transform .35s var(--ease);
+  box-shadow:var(--shadow-lg);
+}
+.modal-overlay.open .modal { transform:scale(1) translateY(0); }
+.modal-icon {
+  width:70px;height:70px;border-radius:50%;
+  background:var(--gold-pale);border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;margin:0 auto 20px;
+}
+.modal-title { font-size:1.4rem;font-weight:900;margin-bottom:8px; }
+.modal-sub { font-size:.9rem;color:var(--ink3);margin-bottom:24px;line-height:1.6; }
+.modal-id {
+  background:var(--ink);color:var(--gold-lt);
+  border-radius:10px;padding:12px 20px;
+  font-family:'DM Mono',monospace;font-size:1.1rem;
+  font-weight:700;letter-spacing:2px;margin-bottom:24px;
+}
+.modal-btn {
+  width:100%;padding:13px;background:var(--ink);color:var(--white);
+  border:none;border-radius:10px;cursor:pointer;
+  font-family:'Tajawal',sans-serif;font-size:.95rem;font-weight:700;
+  transition:all .25s;
+}
+.modal-btn:hover { background:var(--gold);transform:translateY(-1px); }
+
+/* =====================================================
+   TOAST
+===================================================== */
+.toast-container {
+  position:fixed;top:80px;left:50%;transform:translateX(-50%);
+  z-index:2000;display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.toast {
+  background:var(--ink);color:var(--white);
+  padding:12px 20px;border-radius:10px;font-size:.85rem;font-weight:500;
+  display:flex;align-items:center;gap:8px;
+  animation:toastIn .3s var(--ease);box-shadow:var(--shadow-lg);
+  pointer-events:all;
+}
+.toast.success { border-right:3px solid var(--green); }
+.toast.error   { border-right:3px solid var(--red); }
+.toast.warning { border-right:3px solid var(--gold); }
+@keyframes toastIn {
+  from { opacity:0;transform:translateY(-12px); }
+  to   { opacity:1;transform:translateY(0); }
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+@media(max-width:800px) {
+  .booking-layout { grid-template-columns:1fr; }
+  .dash-grid { grid-template-columns:1fr; }
+  .settings-grid { grid-template-columns:1fr; }
+  .header-stats { display:none; }
+  .slots-grid { grid-template-columns:repeat(3,1fr); }
+  .hero-title { font-size:1.6rem; }
+}
+@media(max-width:500px) {
+  .services-grid { grid-template-columns:1fr; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .appt-card { flex-wrap:wrap; }
+  .slots-grid { grid-template-columns:repeat(3,1fr); }
+  .header-inner { gap:10px; }
+  .logo { font-size:1rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon">✅</div>
+    <div class="modal-title">تم تأكيد الحجز!</div>
+    <div class="modal-sub">تم حجز موعدك بنجاح. سنتواصل معك قريباً لتأكيد الموعد.</div>
+    <div class="modal-id" id="bookingId">SW-000000</div>
+    <button class="modal-btn" onclick="closeModal()">حسناً، شكراً!</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-dot">🗓</div>
+      <div>
+        <div>Smart Web</div>
+        <div class="header-sub">نظام حجز المواعيد</div>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat"><strong id="hTotal">0</strong><span>إجمالي</span></div>
+      <div class="hstat"><strong id="hToday">0</strong><span>اليوم</span></div>
+      <div class="hstat"><strong id="hPending">0</strong><span>معلق</span></div>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero-strip">
+  <div class="hero-strip-inner">
+    <div class="hero-tag"><span class="tag-line"></span>نظام إدارة احترافي<span class="tag-line"></span></div>
+    <h1 class="hero-title">احجز موعدك<br><span>بكل سهولة وسرعة</span></h1>
+    <p class="hero-sub">نظام حجز ذكي ومتكامل لإدارة المواعيد بشكل احترافي</p>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showTab('booking')">
+      <span class="tab-icon">📋</span> حجز جديد
+    </button>
+    <button class="tab-btn" onclick="showTab('appointments')">
+      <span class="tab-icon">📅</span> المواعيد
+      <span class="tab-badge" id="tabBadge">0</span>
+    </button>
+    <button class="tab-btn" onclick="showTab('dashboard')">
+      <span class="tab-icon">📊</span> الإحصائيات
+    </button>
+    <button class="tab-btn" onclick="showTab('settings')">
+      <span class="tab-icon">⚙️</span> الإعدادات
+    </button>
+  </div>
+</div>
+
+<!-- ===================== SECTION: BOOKING ===================== -->
+<div class="section active" id="sec-booking">
+  <div class="page">
+    <div class="booking-layout">
+
+      <!-- LEFT: Form -->
+      <div>
+        <!-- Services -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">
+            <div class="card-title-icon">💼</div>
+            اختر الخدمة
+          </div>
+          <div class="services-grid" id="servicesGrid"></div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="card">
+          <div class="card-title">
+            <div class="card-title-icon">👤</div>
+            معلومات العميل
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label><span class="field-req">*</span> الاسم الكامل</label>
+              <input type="text" id="fName" placeholder="أحمد محمد"/>
+            </div>
+            <div class="field">
+              <label><span class="field-req">*</span> رقم الهاتف</label>
+              <input type="tel" id="fPhone" placeholder="0555 123 456"/>
+            </div>
+          </div>
+          <div class="field">
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="fEmail" placeholder="ahmed@example.com"/>
+          </div>
+          <div class="field">
+            <label>ملاحظات إضافية</label>
+            <textarea id="fNotes" placeholder="أي طلبات أو ملاحظات خاصة..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: Calendar + Summary -->
+      <div>
+        <!-- Calendar -->
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title">
+            <div class="card-title-icon">📅</div>
+            اختر التاريخ والوقت
+          </div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">›</button>
+            <span class="cal-month" id="calMonth"></span>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">‹</button>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div class="slots-title" id="slotsTitle" style="display:none;">
+            المواعيد المتاحة ليوم <span id="selDateLabel"></span>
+          </div>
+          <div class="slots-grid" id="slotsGrid"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-card" id="summaryCard" style="display:none;">
+          <div class="summary-title">ملخص الحجز</div>
+          <div class="sum-row"><span class="sum-lbl">الخدمة</span><span class="sum-val" id="sumSvc">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">التاريخ</span><span class="sum-val" id="sumDate">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">الوقت</span><span class="sum-val" id="sumTime">—</span></div>
+          <div class="sum-row"><span class="sum-lbl">العميل</span><span class="sum-val" id="sumName">—</span></div>
+          <div class="sum-total"><span>المبلغ الإجمالي</span><span id="sumPrice">0 دج</span></div>
+        </div>
+
+        <button class="btn-submit" id="submitBtn" onclick="submitBooking()" disabled>
+          <span>تأكيد الحجز</span> ←
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: APPOINTMENTS ===================== -->
+<div class="section" id="sec-appointments">
+  <div class="page">
+    <div class="appt-toolbar">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="ابحث بالاسم أو رقم الهاتف..." oninput="renderAppointments()"/>
+      </div>
+      <button class="filter-btn active" onclick="setFilter('all',this)">الكل</button>
+      <button class="filter-btn" onclick="setFilter('confirmed',this)">مؤكد</button>
+      <button class="filter-btn" onclick="setFilter('pending',this)">معلق</button>
+      <button class="filter-btn" onclick="setFilter('cancelled',this)">ملغى</button>
+    </div>
+    <div class="appt-list" id="apptList"></div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: DASHBOARD ===================== -->
+<div class="section" id="sec-dashboard">
+  <div class="page">
+    <div class="stats-grid" id="statsGrid"></div>
+    <div class="dash-grid">
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">🗓</div>جدول اليوم</div>
+        <div class="schedule-list" id="todayList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">📊</div>الخدمات الأكثر طلباً</div>
+        <div class="donut-wrap">
+          <div class="donut-chart">
+            <svg viewBox="0 0 100 100" width="140" height="140">
+              <circle cx="50" cy="50" r="38" fill="none" stroke="#eeeae2" stroke-width="12"/>
+              <circle id="donut1" cx="50" cy="50" r="38" fill="none" stroke="#c8973a" stroke-width="12"
+                stroke-dasharray="0 239" stroke-linecap="round"/>
+              <circle id="donut2" cx="50" cy="50" r="38" fill="none" stroke="#1a1814" stroke-width="12"
+                stroke-dasharray="0 239" stroke-linecap="round"/>
+              <circle id="donut3" cx="50" cy="50" r="38" fill="none" stroke="#8a8480" stroke-width="12"
+                stroke-dasharray="0 239" stroke-linecap="round"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-num" id="donutNum">0</div>
+              <div class="donut-sub">حجز</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: SETTINGS ===================== -->
+<div class="section" id="sec-settings">
+  <div class="page">
+    <div class="settings-grid">
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">🏢</div>معلومات النشاط</div>
+        <div class="field"><label>اسم النشاط</label><input class="input-sm" value="Smart Web Clinic"/></div>
+        <div class="field"><label>رقم الهاتف</label><input class="input-sm" value="0555 000 111"/></div>
+        <div class="field"><label>العنوان</label><input class="input-sm" value="وهران، الجزائر"/></div>
+        <div class="field"><label>البريد الإلكتروني</label><input class="input-sm" value="info@smartweb.dz"/></div>
+        <button class="btn-submit" onclick="showToast('تم حفظ المعلومات','success')">حفظ التغييرات</button>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">⏰</div>أوقات العمل</div>
+        <div class="field"><label>من الساعة</label><input class="input-sm" type="time" value="08:00"/></div>
+        <div class="field"><label>إلى الساعة</label><input class="input-sm" type="time" value="18:00"/></div>
+        <div class="field"><label>مدة الحجز (دقيقة)</label>
+          <select class="input-sm"><option>30</option><option selected>60</option><option>90</option></select>
+        </div>
+        <div class="field">
+          <label>أيام العمل</label>
+          <div class="hours-grid" id="daysGrid"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">🔔</div>الإشعارات</div>
+        <div class="toggle-row">
+          <div><div class="toggle-lbl">تأكيد الحجز بالرسالة</div><div class="toggle-sub">إرسال SMS عند كل حجز جديد</div></div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-lbl">تذكير قبل الموعد</div><div class="toggle-sub">تذكير تلقائي بـ 24 ساعة</div></div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-lbl">إشعار عند الإلغاء</div><div class="toggle-sub">تنبيه عند إلغاء أي موعد</div></div>
+          <label class="toggle"><input type="checkbox"/><span class="toggle-slider"></span></label>
+        </div>
+        <div class="toggle-row">
+          <div><div class="toggle-lbl">قبول الحجز التلقائي</div><div class="toggle-sub">تأكيد المواعيد فوراً</div></div>
+          <label class="toggle"><input type="checkbox" checked/><span class="toggle-slider"></span></label>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title"><div class="card-title-icon">🛠</div>إجراءات النظام</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <button class="btn-submit" style="background:var(--white);color:var(--ink);border:1.5px solid var(--border);" onclick="exportData()">📤 تصدير البيانات (JSON)</button>
+          <button class="btn-submit" style="background:var(--white);color:var(--red);border:1.5px solid var(--red);" onclick="clearData()">🗑 مسح جميع البيانات</button>
+          <button class="btn-submit" onclick="addDemoData()">✨ إضافة بيانات تجريبية</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= JAVASCRIPT ========================= -->
+<script>
+/* ---------------------------------------------------------------
+   DATA & STATE
+--------------------------------------------------------------- */
+let appointments = JSON.parse(localStorage.getItem('sw_appointments') || '[]');
+
+const SERVICES = [
+  { id:'s1', name:'استشارة طبية',   dur:60, price:2500, icon:'🩺' },
+  { id:'s2', name:'اشعة ',        dur:30, price:800,  icon:'🩺' },
+  { id:'s3', name:'علاج فيزيائي',   dur:90, price:3500, icon:'💪' },
+  { id:'s4', name:' تحليل الدم',     dur:60, price:5000, icon:'🩺' },
+  { id:'s5', name:'تنظيف أسنان',    dur:45, price:4000, icon:'🦷' },
+ 
+];
+
+const DAYS_AR  = ['أحد','اثن','ثلا','أرب','خمس','جمع','سبت'];
+const MONTHS_AR= ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+
+const TIME_SLOTS = ['08:00','09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00','18:00'];
+
+let curYear, curMonth, selDate=null, selTime=null, selSvc=null;
+let filterStatus = 'all';
+
+const now = new Date();
+curYear  = now.getFullYear();
+curMonth = now.getMonth();
+
+/* ---------------------------------------------------------------
+   TABS
+--------------------------------------------------------------- */
+function showTab(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(id==='appointments') renderAppointments();
+  if(id==='dashboard')    renderDashboard();
+  updateHeaderStats();
+}
+
+/* ---------------------------------------------------------------
+   SERVICES GRID
+--------------------------------------------------------------- */
+function renderServices(){
+  const g = document.getElementById('servicesGrid');
+  g.innerHTML = SERVICES.map(s=>`
+    <div class="svc-item${selSvc===s.id?' selected':''}"
+         onclick="selectSvc('${s.id}')">
+      <div class="svc-name">${s.icon} ${s.name}</div>
+      <div class="svc-meta">${s.dur} دقيقة</div>
+      <div class="svc-price">${s.price.toLocaleString('ar-DZ')} دج</div>
+    </div>`).join('');
+}
+
+function selectSvc(id){
+  selSvc = id;
+  renderServices();
+  updateSummary();
+  checkSubmit();
+}
+
+/* ---------------------------------------------------------------
+   CALENDAR
+--------------------------------------------------------------- */
+function renderCalendar(){
+  document.getElementById('calMonth').textContent =
+    `${MONTHS_AR[curMonth]} ${curYear}`;
+  const g = document.getElementById('calGrid');
+  const today = new Date();
+
+  // Day name headers
+  let html = DAYS_AR.map(d=>`<div class="cal-day-name">${d}</div>`).join('');
+
+  const firstDay = new Date(curYear,curMonth,1).getDay();
+  const daysInMonth = new Date(curYear,curMonth+1,0).getDate();
+  const prevDays   = new Date(curYear,curMonth,0).getDate();
+
+  // Prev month padding
+  for(let i=firstDay-1;i>=0;i--){
+    html+=`<button class="cal-day other-month" disabled>${prevDays-i}</button>`;
+  }
+  // Current month
+  for(let d=1;d<=daysInMonth;d++){
+    const dt = new Date(curYear,curMonth,d);
+    const isPast = dt < new Date(today.getFullYear(),today.getMonth(),today.getDate());
+    const isToday = d===today.getDate() && curMonth===today.getMonth() && curYear===today.getFullYear();
+    const ds = dateStr(curYear,curMonth+1,d);
+    const isSel = ds===selDate;
+    const hasSlot = appointments.some(a=>a.date===ds);
+    const dow = dt.getDay();
+    const isOff = dow===5 || dow===6;
+    const cls = [
+      'cal-day',
+      isToday?'today':'',
+      isSel?'selected':'',
+      hasSlot?'has-slots':''
+    ].filter(Boolean).join(' ');
+    html+=`<button class="${cls}" ${(isPast||isOff)?'disabled':''} onclick="selectDate('${ds}',${d})">${d}</button>`;
+  }
+  // Next month padding
+  const total = firstDay + daysInMonth;
+  const rem = total%7===0?0:7-(total%7);
+  for(let d=1;d<=rem;d++){
+    html+=`<button class="cal-day other-month" disabled>${d}</button>`;
+  }
+  g.innerHTML = html;
+}
+
+function changeMonth(dir){
+  curMonth += dir;
+  if(curMonth<0){curMonth=11;curYear--;}
+  if(curMonth>11){curMonth=0;curYear++;}
+  renderCalendar();
+}
+
+function selectDate(ds,d){
+  selDate = ds;
+  selTime = null;
+  renderCalendar();
+  renderSlots();
+  document.getElementById('slotsTitle').style.display='block';
+  document.getElementById('selDateLabel').textContent =
+    `${d} ${MONTHS_AR[curMonth]} ${curYear}`;
+  updateSummary();
+  checkSubmit();
+}
+
+/* ---------------------------------------------------------------
+   TIME SLOTS
+--------------------------------------------------------------- */
+function renderSlots(){
+  const booked = appointments
+    .filter(a=>a.date===selDate && a.status!=='cancelled')
+    .map(a=>a.time);
+  const g = document.getElementById('slotsGrid');
+  g.innerHTML = TIME_SLOTS.map(t=>{
+    const taken = booked.includes(t);
+    const sel   = t===selTime;
+    const cls = ['slot',taken?'taken':'',sel?'selected':''].filter(Boolean).join(' ');
+    return `<button class="${cls}" ${taken?'disabled':''} onclick="selectTime('${t}')">${t}</button>`;
+  }).join('');
+}
+
+function selectTime(t){
+  selTime = t;
+  renderSlots();
+  updateSummary();
+  checkSubmit();
+}
+
+/* ---------------------------------------------------------------
+   SUMMARY & VALIDATION
+--------------------------------------------------------------- */
+function updateSummary(){
+  const svc = SERVICES.find(s=>s.id===selSvc);
+  const sc  = document.getElementById('summaryCard');
+  const show = svc||selDate||selTime;
+  sc.style.display = show?'block':'none';
+  if(svc){
+    document.getElementById('sumSvc').textContent  = svc.name;
+    document.getElementById('sumPrice').textContent = svc.price.toLocaleString('ar-DZ')+' دج';
+  }
+  if(selDate){
+    const [y,m,d] = selDate.split('-');
+    document.getElementById('sumDate').textContent = `${+d} ${MONTHS_AR[+m-1]} ${y}`;
+  }
+  document.getElementById('sumTime').textContent = selTime||'—';
+  const nm = document.getElementById('fName').value.trim();
+  document.getElementById('sumName').textContent = nm||'—';
+}
+
+function checkSubmit(){
+  const svc  = selSvc;
+  const date = selDate;
+  const time = selTime;
+  const nm   = document.getElementById('fName').value.trim();
+  const ph   = document.getElementById('fPhone').value.trim();
+  document.getElementById('submitBtn').disabled = !(svc&&date&&time&&nm&&ph);
+}
+
+document.getElementById('fName').addEventListener('input',()=>{updateSummary();checkSubmit();});
+document.getElementById('fPhone').addEventListener('input',checkSubmit);
+
+/* ---------------------------------------------------------------
+   SUBMIT BOOKING
+--------------------------------------------------------------- */
+function submitBooking(){
+  const svc = SERVICES.find(s=>s.id===selSvc);
+  const id  = 'SW-'+Math.random().toString(36).substring(2,8).toUpperCase();
+  const appt = {
+    id,
+    name:   document.getElementById('fName').value.trim(),
+    phone:  document.getElementById('fPhone').value.trim(),
+    email:  document.getElementById('fEmail').value.trim(),
+    notes:  document.getElementById('fNotes').value.trim(),
+    service:svc.name,
+    serviceId:svc.id,
+    price:  svc.price,
+    date:   selDate,
+    time:   selTime,
+    status:'confirmed',
+    created:new Date().toISOString()
+  };
+  appointments.push(appt);
+  saveData();
+  document.getElementById('bookingId').textContent = id;
+  document.getElementById('modal').classList.add('open');
+  resetForm();
+  updateHeaderStats();
+  updateTabBadge();
+}
+
+function resetForm(){
+  selSvc=null;selDate=null;selTime=null;
+  document.getElementById('fName').value='';
+  document.getElementById('fPhone').value='';
+  document.getElementById('fEmail').value='';
+  document.getElementById('fNotes').value='';
+  renderServices();
+  renderCalendar();
+  document.getElementById('slotsGrid').innerHTML='';
+  document.getElementById('slotsTitle').style.display='none';
+  document.getElementById('summaryCard').style.display='none';
+  document.getElementById('submitBtn').disabled=true;
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('open');
+}
+
+/* ---------------------------------------------------------------
+   APPOINTMENTS LIST
+--------------------------------------------------------------- */
+function renderAppointments(){
+  const q   = document.getElementById('searchInput').value.toLowerCase();
+  const lst = document.getElementById('apptList');
+  let data  = [...appointments].reverse();
+  if(filterStatus!=='all') data = data.filter(a=>a.status===filterStatus);
+  if(q) data = data.filter(a=>
+    a.name.toLowerCase().includes(q)||a.phone.includes(q)||a.id.toLowerCase().includes(q)
+  );
+  if(!data.length){
+    lst.innerHTML=`<div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <div class="empty-title">لا توجد مواعيد</div>
+      <div class="empty-sub">لم يتم العثور على نتائج</div>
+    </div>`;
+    return;
+  }
+  lst.innerHTML = data.map((a,i)=>{
+    const [y,m,d] = a.date.split('-');
+    const st = a.status;
+    const stLbl = st==='confirmed'?'مؤكد':st==='pending'?'معلق':'ملغى';
+    return `<div class="appt-card" style="animation-delay:${i*0.05}s">
+      <div class="appt-date-box">
+        <div class="appt-day">${d}</div>
+        <div class="appt-mon">${MONTHS_AR[+m-1].substring(0,3)}</div>
+      </div>
+      <div class="appt-info">
+        <div class="appt-name">${a.name}</div>
+        <div class="appt-meta">
+          <span>📞 ${a.phone}</span>
+          <span>⏰ ${a.time}</span>
+          <span>💼 ${a.service}</span>
+          <span>💰 ${a.price.toLocaleString('ar-DZ')} دج</span>
+        </div>
+      </div>
+      <span class="status-badge ${st}">${stLbl}</span>
+      <div class="appt-actions">
+        ${st!=='confirmed'?`<button class="appt-btn" onclick="changeStatus('${a.id}','confirmed')" title="تأكيد">✅</button>`:''}
+        ${st!=='cancelled'?`<button class="appt-btn danger" onclick="changeStatus('${a.id}','cancelled')" title="إلغاء">❌</button>`:''}
+        <button class="appt-btn danger" onclick="deleteAppt('${a.id}')" title="حذف">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setFilter(s,el){
+  filterStatus=s;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderAppointments();
+}
+
+function changeStatus(id,st){
+  const a = appointments.find(x=>x.id===id);
+  if(a){ a.status=st; saveData(); renderAppointments(); updateHeaderStats(); }
+  showToast(st==='confirmed'?'تم تأكيد الموعد ✅':'تم إلغاء الموعد',st==='confirmed'?'success':'warning');
+}
+
+function deleteAppt(id){
+  appointments = appointments.filter(x=>x.id!==id);
+  saveData();
+  renderAppointments();
+  updateHeaderStats();
+  updateTabBadge();
+  showToast('تم حذف الموعد','error');
+}
+
+/* ---------------------------------------------------------------
+   DASHBOARD
+--------------------------------------------------------------- */
+function renderDashboard(){
+  const today = dateStr(now.getFullYear(),now.getMonth()+1,now.getDate());
+  const total  = appointments.length;
+  const todayA = appointments.filter(a=>a.date===today);
+  const conf   = appointments.filter(a=>a.status==='confirmed').length;
+  const pend   = appointments.filter(a=>a.status==='pending').length;
+  const rev    = appointments.filter(a=>a.status==='confirmed').reduce((s,a)=>s+a.price,0);
+
+  document.getElementById('statsGrid').innerHTML = [
+    {num:total,         lbl:'إجمالي المواعيد',   trend:'+12%', up:true,  icon:'📋'},
+    {num:todayA.length, lbl:'مواعيد اليوم',       trend:'اليوم',up:true,  icon:'📅'},
+    {num:conf,          lbl:'مواعيد مؤكدة',       trend:'+5%',  up:true,  icon:'✅'},
+    {num:rev.toLocaleString('ar-DZ')+' دج', lbl:'الإيرادات', trend:'+8%', up:true, icon:'💰'},
+  ].map(s=>`<div class="stat-card">
+    <div style="font-size:1.5rem;margin-bottom:6px">${s.icon}</div>
+    <div class="stat-num">${s.num}</div>
+    <div class="stat-lbl">${s.lbl}</div>
+    <div class="stat-trend ${s.up?'trend-up':'trend-dn'}">
+      ${s.up?'▲':'▼'} ${s.trend} من الشهر الماضي
+    </div>
+  </div>`).join('');
+
+  // Today's schedule
+  const tl = document.getElementById('todayList');
+  const todaySorted = todayA.sort((a,b)=>a.time.localeCompare(b.time));
+  if(!todaySorted.length){
+    tl.innerHTML='<div class="empty-state" style="padding:30px"><div class="empty-icon">🌙</div><div class="empty-title">لا مواعيد اليوم</div></div>';
+  } else {
+    const dotColors={'confirmed':'#2e7d52','pending':'#c8973a','cancelled':'#d44a3a'};
+    tl.innerHTML = todaySorted.map(a=>`
+      <div class="sch-item">
+        <div class="sch-time">${a.time}</div>
+        <div class="sch-sep"></div>
+        <div>
+          <div class="sch-name">${a.name}</div>
+          <div class="sch-svc">${a.service}</div>
+        </div>
+        <div class="sch-dot" style="background:${dotColors[a.status]||'#888'}"></div>
+      </div>`).join('');
+  }
+
+  // Donut
+  const svcCount = {};
+  appointments.forEach(a=>{ svcCount[a.service]=(svcCount[a.service]||0)+1; });
+  const sorted = Object.entries(svcCount).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const colors = ['#c8973a','#1a1814','#8a8480'];
+  const circ   = 2*Math.PI*38;
+  let offset   = 0;
+  const tot    = sorted.reduce((s,[,v])=>s+v,0)||1;
+  document.getElementById('donutNum').textContent = appointments.length;
+
+  ['donut1','donut2','donut3'].forEach((id,i)=>{
+    const el = document.getElementById(id);
+    if(sorted[i]){
+      const pct = sorted[i][1]/tot;
+      const dash = circ*pct - 2;
+      el.setAttribute('stroke-dasharray',`${dash} ${circ-dash}`);
+      el.setAttribute('stroke-dashoffset',-offset);
+      el.setAttribute('stroke',colors[i]);
+      offset += circ*pct;
+    } else {
+      el.setAttribute('stroke-dasharray','0 239');
+    }
+  });
+
+  document.getElementById('donutLegend').innerHTML = sorted.map(([nm,cnt],i)=>`
+    <div class="legend-item">
+      <div class="legend-dot" style="background:${colors[i]}"></div>
+      <span>${nm}</span>
+      <span class="legend-val">${cnt}</span>
+    </div>`).join('');
+}
+
+/* ---------------------------------------------------------------
+   SETTINGS HELPERS
+--------------------------------------------------------------- */
+function renderDaysGrid(){
+  const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const workDays=[true,true,true,true,true,false,false];
+  document.getElementById('daysGrid').innerHTML = days.map((d,i)=>
+    `<div class="day-toggle${workDays[i]?' on':''}" onclick="this.classList.toggle('on')">${d.substring(0,2)}</div>`
+  ).join('');
+}
+
+function exportData(){
+  const blob = new Blob([JSON.stringify(appointments,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'appointments.json';
+  a.click();
+  showToast('تم تصدير البيانات 📤','success');
+}
+
+function clearData(){
+  if(confirm('هل أنت متأكد من مسح جميع البيانات؟')){
+    appointments=[];saveData();
+    updateHeaderStats();updateTabBadge();
+    showToast('تم مسح البيانات 🗑','warning');
+  }
+}
+
+function addDemoData(){
+  const demoNames=['أحمد بوعلام','سارة حمدان','كريم بلال','فاطمة زهرة','يوسف رزيق','نور الهدى','عمر طيب'];
+  const statuses=['confirmed','confirmed','confirmed','pending','cancelled'];
+  for(let i=0;i<8;i++){
+    const d = new Date();
+    d.setDate(d.getDate()+Math.floor(Math.random()*14)-3);
+    const svc = SERVICES[Math.floor(Math.random()*SERVICES.length)];
+    appointments.push({
+      id:'SW-'+Math.random().toString(36).substring(2,8).toUpperCase(),
+      name: demoNames[Math.floor(Math.random()*demoNames.length)],
+      phone:'055'+Math.floor(1000000+Math.random()*9000000),
+      email:'',notes:'',
+      service:svc.name,serviceId:svc.id,price:svc.price,
+      date: dateStr(d.getFullYear(),d.getMonth()+1,d.getDate()),
+      time: TIME_SLOTS[Math.floor(Math.random()*TIME_SLOTS.length)],
+      status:statuses[Math.floor(Math.random()*statuses.length)],
+      created:new Date().toISOString()
+    });
+  }
+  saveData();updateHeaderStats();updateTabBadge();
+  showToast('تمت إضافة بيانات تجريبية ✨','success');
+}
+
+/* ---------------------------------------------------------------
+   UTILS
+--------------------------------------------------------------- */
+function dateStr(y,m,d){ return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+
+function saveData(){ localStorage.setItem('sw_appointments',JSON.stringify(appointments)); }
+
+function updateHeaderStats(){
+  const today = dateStr(now.getFullYear(),now.getMonth()+1,now.getDate());
+  document.getElementById('hTotal').textContent   = appointments.length;
+  document.getElementById('hToday').textContent   = appointments.filter(a=>a.date===today).length;
+  document.getElementById('hPending').textContent = appointments.filter(a=>a.status==='pending').length;
+}
+
+function updateTabBadge(){
+  document.getElementById('tabBadge').textContent = appointments.length;
+}
+
+function showToast(msg,type='success'){
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${msg}</span>`;
+  c.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',2500);
+  setTimeout(()=>t.remove(),2800);
+}
+
+/* ---------------------------------------------------------------
+   INIT
+--------------------------------------------------------------- */
+renderServices();
+renderCalendar();
+renderDaysGrid();
+updateHeaderStats();
+updateTabBadge();
+</script>
+</body>
+</html>
